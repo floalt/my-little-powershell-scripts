@@ -15,12 +15,6 @@ And so it is running
 
 #>
 
-<#
-$server = "10.200.220.10"
-$user = "atrium\fiebig"
-$pass = "dF2018Ascair"
-#>
-
 param(
     $server,
     $user,

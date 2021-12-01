@@ -6,7 +6,7 @@
 function errorcheck {
 
     <#
-    writing $yeah and $shit in logfile counts errors
+    writing $yeah and $shit in logfile and counting errors
     needs this functions:
         start-logfile (for $log_tempfile)
         close-logfile
@@ -24,6 +24,28 @@ function errorcheck {
         $script:errorcount = $script:errorcount + 1
     }
 }
+
+
+function errorcheck {
+
+    <#
+    writing $yeah and $shit in standard output and counting errors
+
+    usage:
+        declare at the beginning of your script: $errorcount = 0
+        $yeah = "OK: everything went allright"
+        $shit = "ERROR: this didnt work"
+        [do someting complicated]; errorcheck
+    #>
+
+    if ($?) {
+        write-host $yeah -F Green
+    } else {
+        write-host $shit -F Red
+        $script:errorcount = $script:errorcount + 1
+    }
+}
+
 
 
 function failcheck {
@@ -185,6 +207,7 @@ function dl-morefiles {
 
     <#
     downloads a array of files from a url
+        uses Bits-Transfer
     needs this function:
         errorcheck
     usage:
@@ -206,6 +229,31 @@ function dl-morefiles {
 
 
 
+function dl-morefiles {
+
+    <#
+    downloads a array of files from a url
+        uses Invoke-WebRequest
+    needs this function:
+        errorcheck
+    usage:
+        declare outsite this script
+            $dl_files = @{
+                @{name='My first file';url='https://my.domain.org/file1';file = 'file1'}
+                @{name='My second file';url='https://my.domain.org/file2';file = 'file2'}
+            }
+            $dl_folder = "path\to\download\folder"
+    #>
+
+    foreach ($element in $dl_files) {
+
+        $output = $dl_folder + "\" + $element.file
+
+        $yeah="OK: Downloading " + $element.name + " successful"
+        $shit="FAIL: Downloading " + $element.name + " failed"
+        Invoke-WebRequest $element.url -Outfile $output; errorcheck
+    }
+}
 
 
 

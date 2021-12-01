@@ -582,10 +582,10 @@ function press-anykey-to-close {
     asks the user to press any key to close the window / script
     #>
     
-    function shutup {
     Read-Host "
     ENDE: Drücke die Entertaste, um das Fenster zu schließen."
     exit
+
 }
 
 

@@ -1,6 +1,6 @@
 
 
-# ------------------------- ERRORCHECK / LOGFILES ------------------------- #
+# ------------------------- ERRORCHECK / LOGFILES / SCRIPTUPDATE ------------------------- #
 
 
 function errorcheck {
@@ -174,7 +174,26 @@ function remove-logfiles {
 
 
 
+function start-scriptupdate {
 
+    <#
+    this is a update-myself function ;-)
+    downloads the current script source from GitHub
+    
+    usage:
+        call at the end of your script (before closing logfiles)
+        declare outside this function:
+            $scriptsrc = "https://raw.githubusercontent.com/full/path/to/the/script.ps1"
+            $scriptpath = (Split-Path -parent $PSCommandPath)
+            $scriptname = $MyInvocation.MyCommand.Name
+            $scriptfullpath = $scriptpath + "\" + $scriptname
+    #>
+
+    $yeah="OK: Self-Update of this script successful"
+    $shit="FAIL: Self-Update of this script failed"
+    Invoke-WebRequest -Uri $scriptsrc -OutFile $scriptfullpath; errorcheck
+
+}
 
 
 

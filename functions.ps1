@@ -187,12 +187,15 @@ function start-scriptupdate {
             $scriptpath = (Split-Path -parent $PSCommandPath)
             $scriptname = $MyInvocation.MyCommand.Name
             $scriptfullpath = $scriptpath + "\" + $scriptname
+        declare in config-file (or within the script)
+            $autoupdate = 1
     #>
 
-    $yeah="OK: Self-Update of this script successful"
-    $shit="FAIL: Self-Update of this script failed"
-    Invoke-WebRequest -Uri $scriptsrc -OutFile $scriptfullpath; errorcheck
-
+    if ($autoupdate -eq 1) {
+        $yeah="OK: Self-Update of this script successful"
+        $shit="FAIL: Self-Update of this script failed"
+        Invoke-WebRequest -Uri $scriptsrc -OutFile $scriptfullpath; errorcheck
+    }
 }
 
 

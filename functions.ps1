@@ -12,12 +12,14 @@ function errorcheck {
         close-logfile
     usage:
         declare at the beginning of your script: $errorcount = 0
+        set '-ErrorVariable errchk' to every cmdlet you want to errorcheck
+        
         $yeah = "OK: everything went allright"
         $shit = "ERROR: this didnt work"
-        [do someting complicated]; errorcheck
+        [do someting complicated] -ErrorVariable errchk; errorcheck
     #>
 
-    if ($?) {
+    if (!$errchk) {
         $yeah >> $log_tempfile
     } else {
         $shit >> $log_tempfile
@@ -33,19 +35,21 @@ function errorcheck {
 
     usage:
         declare at the beginning of your script: $errorcount = 0
+        set '-ErrorVariable errchk' to every cmdlet you want to errorcheck
+        
         $yeah = "OK: everything went allright"
         $shit = "ERROR: this didnt work"
-        [do someting complicated]; errorcheck
+        [do someting complicated] -ErrorVariable errchk; errorcheck
     #>
 
-    if ($?) {
+    if (!$errchk) {
         write-host $yeah -F Green
     } else {
         write-host $shit -F Red
-        $script:errorcount = $script:errorcount + 1
     }
-}
 
+    $errchk = $null
+}
 
 
 function failcheck {
@@ -58,12 +62,14 @@ function failcheck {
     usage:
         declare at the beginning of your script: $errorcount = 0
         make a function 'fail-rollback' with steps to do at the end, e.g. disconnect smb share
+        set '-ErrorVariable errchk' to every cmdlet you want to errorcheck
+        
         $yeah = "OK: everything went allright"
         $shit = "FAIL: this didnt work"
-        [do someting real important]; failcheck
+        [do someting real important] -ErrorVariable errchk; failcheck
     #>
 
-    if ($?) {
+    if (!$errchk) {
         $yeah >> $log_tempfile
     } else {
         $shit >> $log_tempfile
@@ -74,6 +80,8 @@ function failcheck {
         close-logfile
         exit 1
     }
+
+    $errchk = $null
 }
 
 

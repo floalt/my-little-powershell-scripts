@@ -292,6 +292,8 @@ function dl-morefiles {
 # ------------------------- delete files ------------------------- #
 
 
+# Delete files out of array
+
 $filestodelete = @(
     "$env:PUBLIC\Desktop\File1.lnk",
     "$env:PUBLIC\Desktop\Other File.lnk"
@@ -304,9 +306,26 @@ function remove-files {
 }
 
 
+# Delete Files, keep newest (wenn Datum über den Dateinamen abgebildet wird)
 
+$tidypath = C:\Path\To\Folder
+$filter = "string*"
+$keep = 4
 
+function tidyup {
 
+    $items = Get-ChildItem -Path $tidypath -Filter $filter | Sort-Object Name -Descending
+    $counts = $items.Count
+
+    $c = $counts - 1   # remember: arrays start at [0] and not at [1]
+    $e = $keep - 1
+
+    while ($c -gt $e) {
+        Write-Host "Deleting:" $items[$c].FullName
+        Remove-Item -Recurse $items[$c].FullName
+        $c = $c -1
+    }
+}
 
 
 # ------------------------- SMB-Shares ------------------------- #

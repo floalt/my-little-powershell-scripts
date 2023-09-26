@@ -328,6 +328,25 @@ function tidyup {
 }
 
 
+
+
+# Delete Files, wenn size exceeded
+
+$pathtofile = "C:\test\files\file.dat"
+$size = 4       # [MB]
+
+function tidyupsize {
+
+    $item = Get-ChildItem -Path $pathtofile
+    if ( $item.Length/1MB -gt $size ) {
+        Remove-Item $pathtofile
+        echo "Removing $pathtofile"
+    } else {
+        echo "nothing to do"
+    }
+
+}
+
 # ------------------------- SMB-Shares ------------------------- #
 
 

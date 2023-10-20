@@ -1,0 +1,43 @@
+<#
+description:
+
+    upload a file to Nextcloud file drop share
+
+    You have to do this:
+    - make a Nextcloud file drop share (no password)
+    - take the last part of the Share-URL: this is your $sharetoken
+        eg: https://cloud.fa-netz.de/s/wYFwioR9NG62ffr
+        $sharetoken = "wYFwioR9NG62ffr"
+
+author: https://www.croix.at/blog/easy-nextcloud-file-drop-upload-using-powershell/
+
+#>
+
+## set the config
+
+$NextcloudUrl = "https://cloud.fa-netz.de"
+$sharetoken = "wYFwioR9NG62ffr"
+$filepath = "c:\test_file.txt"
+
+
+
+## lets go
+
+# Enable TLS 1.2
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+# Getting all the files in the specified folder
+$Item = Get-ChildItem -Recurse $filepath | Sort-Object fullname | Select FullName
+
+# Will process each file individually and upload them to the cloud.
+$Item | ForEach-Object {
+    $file = $_.FullName
+    $Item = Get-Item $file
+
+    $Headers = @{
+        "Authorization"=$("Basic $([System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($("$($sharetoken):"))))");
+        "X-Requested-With"="XMLHttpRequest";
+    }
+    $webdav = "$($NextcloudUrl)/public.php/webdav/$($Item.Name)"
+    Invoke-RestMethod -Uri $webdav -InFile $Item.Fullname -Headers $Headers -Method Put
+}

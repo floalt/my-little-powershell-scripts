@@ -210,7 +210,42 @@ function start-scriptupdate {
 
 
 
-# ------------------------- Downlaods ------------------------- #
+# ------------------------- Downlaods / Uploads ------------------------- #
+
+
+
+function Upload-Nextcloud ($file_to_upload) {
+    
+    <#
+    upload a file to Nextcloud file drop share
+
+    You have to do this:
+    - make a Nextcloud file drop share (no password)
+    - take the last part of the Share-URL: this is your $sharetoken
+        eg: https://cloud.fa-netz.de/s/wYFwioR9NG62ffr
+        $sharetoken = "wYFwioR9NG62ffr"
+
+    - define outside the function:
+        $NextcloudUrl = "https://cloud.fa-netz.de"
+        $sharetoken = "wYFwioR9NG62ffr"
+    #>
+
+    # Enable TLS 1.2
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+    # preparing
+    $Item = Get-Item $file_to_upload
+    $Headers = @{
+        "Authorization"=$("Basic $([System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($("$($sharetoken):"))))");
+        "X-Requested-With"="XMLHttpRequest";
+    }
+    $webdav = "$($NextcloudUrl)/public.php/webdav/$($Item.Name)"
+    
+    #upload
+    Invoke-RestMethod -Uri $webdav -InFile $Item.Fullname -Headers $Headers -Method Put
+
+}
+
 
 
 
@@ -306,29 +341,17 @@ function remove-files {
 }
 
 
-# Delete Files, keep newest (wenn Datum über den Dateinamen abgebildet wird)
+
+# Delete Files, keep x newest files
 
 $tidypath = C:\Path\To\Folder
 $filter = "string*"
 $keep = 4
 
 function tidyup {
-
-    $items = Get-ChildItem -Path $tidypath -Filter $filter | Sort-Object Name -Descending
-    $counts = $items.Count
-
-    $c = $counts - 1   # remember: arrays start at [0] and not at [1]
-    $e = $keep - 1
-
-    while ($c -gt $e) {
-        Write-Host "Deleting:" $items[$c].FullName
-        Remove-Item -Recurse $items[$c].FullName
-        $c = $c -1
-    }
+    $files_to_delete = Get-ChildItem -Path $tidypath -Filter $filter | Sort-Object LastWriteTime -Descending | Select-Object -Skip $keep
+    foreach ($file in $files_to_delete) {Remove-Item $file.FullName -Force}
 }
-
-
-
 
 # Delete Files, wenn size exceeded
 

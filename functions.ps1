@@ -344,7 +344,7 @@ function remove-files {
 
 # Delete Files, keep x newest files
 
-$tidypath = C:\Path\To\Folder
+$tidypath = "C:\Path\To\Folder"
 $filter = "string*"
 $keep = 4
 
@@ -352,6 +352,20 @@ function tidyup {
     $files_to_delete = Get-ChildItem -Path $tidypath -Filter $filter | Sort-Object LastWriteTime -Descending | Select-Object -Skip $keep
     foreach ($file in $files_to_delete) {Remove-Item $file.FullName -Force}
 }
+
+
+# Delete Files, oder than x days (recursive)
+
+$tidypath = "C:\Path\To\Folder"
+$keepdays = 10
+
+function tidyup {
+    $deldate = (Get-Date).AddDays(-$keepdays)
+    $files_to_delete = Get-ChildItem -Path $tidypath -Recurse | Where-Object { $_.LastWriteTime -lt $deldate }
+    foreach ($file in $files_to_delete) {Remove-Item $file.FullName -Force}
+}
+
+
 
 # Delete Files, wenn size exceeded
 
@@ -369,6 +383,25 @@ function tidyupsize {
     }
 
 }
+
+
+
+# Delete empty Folders (recursiv)
+
+$tidypath = "C:\Path\To\Folder"
+
+function Remove-EmptyFolders {
+    $emptyFolders = Get-ChildItem -Path $tidypath -Recurse | Where-Object { $_.PSIsContainer -and @(Get-ChildItem $_.FullName).Count -eq 0 }
+
+    while ($emptyFolders.Count -gt 0) {
+        foreach ($folder in $emptyFolders) {
+            Remove-Item $folder.FullName -Force
+        }
+        $emptyFolders = Get-ChildItem -Path $tidypath -Recurse | Where-Object { $_.PSIsContainer -and @(Get-ChildItem $_.FullName).Count -eq 0 }
+    }
+}
+
+
 
 # ------------------------- SMB-Shares ------------------------- #
 

@@ -4,5 +4,5 @@ $DriveLetter = "V"
 Clear-Variable -Name check
 $check = Get-Partition | ? DriveLetter -eq $DriveLetter
 if (!$check) {
-    Get-Partition | ? DiskId -like "*$DiskID*" | Set-Partition -NewDriveLetter $DriveLetter
+    Get-Partition | Where-Object {($_.DiskId -like "*$DiskID*") -and ($_.Type -eq "Basic")} | Set-Partition -NewDriveLetter $DriveLetter
 }

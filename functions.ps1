@@ -25,6 +25,8 @@ function errorcheck {
         $shit >> $log_tempfile
         $script:errorcount = $script:errorcount + 1
     }
+
+    $errchk = $null
 }
 
 
